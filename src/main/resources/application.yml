@@ -1,0 +1,38 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: notification-service
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: notification-group
+      auto-offset-reset: earliest
+
+kafka:
+  topics:
+    user-events: user-events-topic
+
+app:
+  email:
+    from: ${EMAIL_USERNAME}
+  site:
+    url: https://kakoi-site.com
+logging:
+  level:
+    com.aston.notification: DEBUG
+    org.springframework.kafka: INFO
