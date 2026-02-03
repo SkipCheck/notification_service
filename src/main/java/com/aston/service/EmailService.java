@@ -1,6 +1,5 @@
 package com.aston.service;
 
-import com.aston.dto.UserEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,10 +56,10 @@ public class EmailService {
             message.setText(text);
 
             mailSender.send(message);
-            log.info("Email отправлен на адрес: {}", toEmail);
+            log.info("Email успешно отправлен на адрес: {}", toEmail);
         } catch (Exception e) {
-            log.error("Ошибка при отправке email на адрес {}: {}", toEmail, e.getMessage());
-            throw new RuntimeException("Не удалось отправить email", e);
+            log.error("Ошибка при отправке email на адрес {}: {}", toEmail, e.getMessage(), e);
+            throw new RuntimeException("Не удалось отправить email на адрес: " + toEmail, e);
         }
     }
 }

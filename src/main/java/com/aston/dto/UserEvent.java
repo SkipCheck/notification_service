@@ -11,7 +11,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserEvent {
 
-    private String eventType;
+    public enum EventType{
+        USER_CREATED,
+        USER_DELETED
+    }
+
+    private EventType eventType;
     private String email;
     private String name;
     private Long id;
