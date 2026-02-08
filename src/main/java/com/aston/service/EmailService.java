@@ -1,5 +1,7 @@
 package com.aston.service;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +22,8 @@ public class EmailService {
     @Value("${app.site.url}")
     private String siteUrl;
 
+    @CircuitBreaker(name = "emailService", fallbackMethod = "sendEmailFallback")
+    @Retry(name = "emailService")
     public void sendUserCreatedEmail(String toEmail, String userName) {
         String subject = "Добро пожаловать!";
         String message = String.format(
@@ -34,6 +38,8 @@ public class EmailService {
         sendEmail(toEmail, subject, message);
     }
 
+    @CircuitBreaker(name = "emailService", fallbackMethod = "sendEmailFallback")
+    @Retry(name = "emailService")
     public void sendUserDeletedEmail(String toEmail, String userName) {
         String subject = "Аккаунт удален";
         String message = String.format(
@@ -61,5 +67,19 @@ public class EmailService {
             log.error("Ошибка при отправке email на адрес {}: {}", toEmail, e.getMessage(), e);
             throw new RuntimeException("Не удалось отправить email на адрес: " + toEmail, e);
         }
+    }
+
+    // ========== FALLBACK METHODS ==========
+
+    // Fallback для sendUserCreatedEmail
+    public void sendEmailFallback(String toEmail, String userName, Throwable throwable) {
+        log.warn("FALLBACK вызван для sendUserCreatedEmail. Email НЕ отправлен на адрес: {}. Причина: {}",
+                toEmail, throwable != null ? throwable.getMessage() : "неизвестна");
+    }
+
+    // Fallback для sendUserDeletedEmail (если нужен отдельный)
+    public void sendUserDeletedEmailFallback(String toEmail, String userName, Throwable throwable) {
+        log.warn("FALLBACK вызван для sendUserDeletedEmail. Email НЕ отправлен на адрес: {}. Причина: {}",
+                toEmail, throwable != null ? throwable.getMessage() : "неизвестна");
     }
 }
